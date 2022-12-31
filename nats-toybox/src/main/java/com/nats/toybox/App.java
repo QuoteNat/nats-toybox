@@ -12,8 +12,7 @@ public class App extends JavaPlugin
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new CapybaraJoinListener(), this);
     }
-    @Override
-    public void onDisable() {
-        getLogger().info("See you again, SpigotMC!");
-    }
+    // @Override
+    // public void onDisable() {
+    // }
 }
