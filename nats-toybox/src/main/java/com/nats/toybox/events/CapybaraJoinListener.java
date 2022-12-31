@@ -1,4 +1,4 @@
-package com.nats.toybox;
+package com.nats.toybox.events;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
