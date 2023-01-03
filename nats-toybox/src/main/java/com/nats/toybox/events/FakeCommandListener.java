@@ -72,6 +72,9 @@ public class FakeCommandListener implements Listener {
                     MessageHelper(str, 1L);
                 }
                 break;
+            case "MACHINE! Trans. Rights. Now.":
+                MessageHelper("on its way to run transrights.exe right this fucking instant", 1L);
+                break;
         }
 
     } 
