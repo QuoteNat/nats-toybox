@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -24,7 +25,9 @@ public class FakeSudoListener implements Listener {
         String message = e.getMessage();
         long delay = 10;
     
-        if (message.equals("sudo rm -rf /*")) {
+        // If the player is op and types sudo rm -rf /*
+        if (e.getPlayer().isOp() && message.equals("sudo rm -rf /*")) {
+            // Print the fake verbose rm ;)
             InputStream is = getClass().getResourceAsStream("fake_rm.txt");
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
@@ -43,6 +46,16 @@ public class FakeSudoListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(plugin, msg, delay + 1L * count);
                 count++;
             }
+        } else if (message.equals("sudo rm -rf /*")) {
+            final String str = new StringBuffer(e.getPlayer().getName() + " is not in the sudoers file. This incident will be reported.").toString();
+            Runnable msg = new Runnable() {
+                @Override
+                public void run() {
+                    Bukkit.broadcastMessage(str);
+                }
+            };
+
+            Bukkit.getScheduler().runTaskLater(plugin, msg, 1L);
         }
     } 
 }
