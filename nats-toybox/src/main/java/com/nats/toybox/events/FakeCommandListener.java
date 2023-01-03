@@ -14,9 +14,10 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import com.nats.toybox.App;
 
 /**
- * A listener to output fake messages inspired by real unix commands.
+ * A listener to output fake/joke responses to easter egg strings. 
+ * None of the commands do anything, they're just for humor.
  */
-public class FakeSudoListener implements Listener {
+public class FakeCommandListener implements Listener {
     private final App plugin = App.getPlugin(App.class);
 
     /**
@@ -39,8 +40,7 @@ public class FakeSudoListener implements Listener {
     
     /**
      * Listener for chat easter egg commands. 
-     * Included commands are the fake "sudo rm -rf /*"
-     * @param e
+     * @param e The chat event
      * @throws IllegalArgumentException
      * @throws IOException
      */
@@ -48,25 +48,31 @@ public class FakeSudoListener implements Listener {
     public void AsyncChatEvent(AsyncPlayerChatEvent e) throws IllegalArgumentException, IOException {
         String message = e.getMessage();
         long delay = 40;
-    
-        // If the player is op and types sudo rm -rf /*
-        if (e.getPlayer().isOp() && message.equals("sudo rm -rf /*")) {
-            // Print the fake verbose rm ;)
-            InputStream is = getClass().getResourceAsStream("fake_rm.txt");
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-            String line;
+        
+        // Check for easter egg messages in chat
+        switch(message) {
+            case "sudo rm -rf /*":
+                // If the player is op
+                if (e.getPlayer().isOp()) {
+                    // Print the fake verbose rm ;)
+                    InputStream is = getClass().getResourceAsStream("fake_rm.txt");
+                    InputStreamReader isr = new InputStreamReader(is);
+                    BufferedReader br = new BufferedReader(isr);
+                    String line;
 
-            int count = 0;
-            while ((line = br.readLine()) != null) {
-                MessageHelper(line, delay + 1L * count);
-                count++;
-            }
-        } else if (message.equals("sudo rm -rf /*")) {
-            // Print fake incident will be reported message if user is not op and tries to do the fake command
-            String str = e.getPlayer().getName() + " is not in the sudoers file. This incident will be reported.";
-            
-            MessageHelper(str, 1L);
+                    int count = 0;
+                    while ((line = br.readLine()) != null) {
+                        MessageHelper(line, delay + 1L * count);
+                        count++;
+                    }
+                } else {
+                    // Print fake incident will be reported message if user is not op and tries to do the fake command
+                    String str = e.getPlayer().getName() + " is not in the sudoers file. This incident will be reported.";
+                    
+                    MessageHelper(str, 1L);
+                }
+                break;
         }
+
     } 
 }
