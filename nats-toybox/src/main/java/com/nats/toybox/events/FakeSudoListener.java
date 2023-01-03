@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -19,11 +18,36 @@ import com.nats.toybox.App;
  */
 public class FakeSudoListener implements Listener {
     private final App plugin = App.getPlugin(App.class);
+
+    /**
+     * Sends a server message to the chat after a delay
+     * @param msg The message to send
+     * @param delay The delay in ticks
+     */
+    private void MessageHelper(String msg, long delay) {
+        final String copyMsg = new StringBuffer(msg).toString();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage(copyMsg);
+            }
+        };
+
+        Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
+    }
     
+    /**
+     * Listener for chat easter egg commands. 
+     * Included commands are the fake "sudo rm -rf /*"
+     * @param e
+     * @throws IllegalArgumentException
+     * @throws IOException
+     */
     @EventHandler (priority = EventPriority.MONITOR)
     public void AsyncChatEvent(AsyncPlayerChatEvent e) throws IllegalArgumentException, IOException {
         String message = e.getMessage();
-        long delay = 10;
+        long delay = 40;
     
         // If the player is op and types sudo rm -rf /*
         if (e.getPlayer().isOp() && message.equals("sudo rm -rf /*")) {
@@ -35,27 +59,14 @@ public class FakeSudoListener implements Listener {
 
             int count = 0;
             while ((line = br.readLine()) != null) {
-                final String copyLine = new StringBuffer(line).toString();
-                Runnable msg = new Runnable() {
-                    @Override
-                    public void run() {
-                        Bukkit.broadcastMessage(copyLine);
-                    }
-                };
-
-                Bukkit.getScheduler().runTaskLater(plugin, msg, delay + 1L * count);
+                MessageHelper(line, delay + 1L * count);
                 count++;
             }
         } else if (message.equals("sudo rm -rf /*")) {
-            final String str = new StringBuffer(e.getPlayer().getName() + " is not in the sudoers file. This incident will be reported.").toString();
-            Runnable msg = new Runnable() {
-                @Override
-                public void run() {
-                    Bukkit.broadcastMessage(str);
-                }
-            };
-
-            Bukkit.getScheduler().runTaskLater(plugin, msg, 1L);
+            // Print fake incident will be reported message if user is not op and tries to do the fake command
+            String str = e.getPlayer().getName() + " is not in the sudoers file. This incident will be reported.";
+            
+            MessageHelper(str, 1L);
         }
     } 
 }
